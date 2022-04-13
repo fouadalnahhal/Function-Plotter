@@ -1,4 +1,4 @@
-Function Plotter
+Function Plotter using .Net, C# Eval Expression, ScottPlot.Net, and blazor server for frontend
 
  plots arbitrary user-entered function
  
