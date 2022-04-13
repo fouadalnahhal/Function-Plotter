@@ -1,0 +1,65 @@
+﻿@page "/"
+@using ScottPlot
+@using Function_Plotter.Data
+@using Z.Expressions;
+
+<PageTitle>Function Plotter</PageTitle>
+
+<h1>Function Plot</h1>
+
+<EditForm Model="@functionPlotModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <p>
+        <label>
+            F(x):
+            <InputText @bind-Value="functionPlotModel.FunctionOfX" />
+        </label>
+    </p>
+
+    <p>
+        <label>
+            Minum value of X:
+            <InputNumber @bind-Value="functionPlotModel.MinValueOfX" />
+        </label>
+    </p>
+
+    <p>
+        <label>
+            Maximun value of X:
+            <InputNumber @bind-Value="functionPlotModel.MaxValueOfX" />
+        </label>
+    </p>
+
+    <button type="submit">Plot</button>
+</EditForm>
+
+@if (imageSource is not null)
+{
+    <div>
+        <img src="@imageSource" />
+    </div>
+}
+
+@code {
+    private string? imageSource;
+    private FunctionPlotModel functionPlotModel = new();
+
+    private void HandleValidSubmit()
+    {
+        var dataX = new List<double>();
+        var dataY = new List<double>();
+        var interval = Enumerable.Range(functionPlotModel.MinValueOfX, functionPlotModel.MaxValueOfX - functionPlotModel.MinValueOfX);
+        foreach (var i in interval)
+        {
+            dataX.Add(i);
+            dataY.Add(Eval.Execute<int>(functionPlotModel.FunctionOfX, new { x = i }));
+        }
+        var plt = new ScottPlot.Plot(400, 300);
+        plt.AddScatter(dataX.ToArray(), dataY.ToArray());
+        var g = Guid.NewGuid().ToString();
+        plt.SaveFig($"wwwroot/images/quickstart{g}.png");
+        imageSource = $"images/quickstart{g}.png";
+    }
+}
